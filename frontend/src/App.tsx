@@ -124,7 +124,7 @@ function App() {
   const [loading, setLoading]             = useState(false);
   const [report, setReport]               = useState<ResearchReport | null>(null);
   const [error, setError]                 = useState('');
-  const [userName, setUserName]           = useState<string | null>('Demo User');
+  const [userName, setUserName]           = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<SectionId>('overview');
   const [activeNav, setActiveNav]         = useState<NavTab>('home');
   const [showUserMenu, setShowUserMenu]   = useState(false);
@@ -137,25 +137,18 @@ function App() {
   const [selectedMarket, setSelectedMarket] = useState<MarketAsset | null>(null);
   const [isMarketModalOpen, setIsMarketModalOpen] = useState(false);
 
-  // Auto-login or perform silent demo login to acquire a valid token
+  // Auto-login check
   useEffect(() => {
     const initAuth = async () => {
       const storedUser = authService.getStoredUser();
       if (storedUser && authService.isAuthenticated()) {
         setUserName(storedUser.name);
-      } else {
-        try {
-          const user = await authService.demoLogin();
-          setUserName(user.name);
-        } catch (err) {
-          console.error("Silent demo login failed", err);
-          // Fallback to local guest name if backend is down/unreachable
-          setUserName("Demo User");
-        }
       }
+      // Removed silent demo login to allow user to see the login page first
     };
     initAuth();
   }, []);
+
 
   useEffect(() => {
     const timer = setInterval(() => {
