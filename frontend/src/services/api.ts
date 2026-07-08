@@ -3,7 +3,7 @@ import { ResearchReport } from '../types';
 import { authService } from './authService';
 
 const api = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL || ''}/api`,
+  baseURL: '/api',
   timeout: 120000,
 });
 
