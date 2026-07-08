@@ -137,12 +137,24 @@ function App() {
   const [selectedMarket, setSelectedMarket] = useState<MarketAsset | null>(null);
   const [isMarketModalOpen, setIsMarketModalOpen] = useState(false);
 
-  // Auto-login if a JWT token already exists in localStorage
+  // Auto-login or perform silent demo login to acquire a valid token
   useEffect(() => {
-    const storedUser = authService.getStoredUser();
-    if (storedUser && authService.isAuthenticated()) {
-      setUserName(storedUser.name);
-    }
+    const initAuth = async () => {
+      const storedUser = authService.getStoredUser();
+      if (storedUser && authService.isAuthenticated()) {
+        setUserName(storedUser.name);
+      } else {
+        try {
+          const user = await authService.demoLogin();
+          setUserName(user.name);
+        } catch (err) {
+          console.error("Silent demo login failed", err);
+          // Fallback to local guest name if backend is down/unreachable
+          setUserName("Demo User");
+        }
+      }
+    };
+    initAuth();
   }, []);
 
   useEffect(() => {
