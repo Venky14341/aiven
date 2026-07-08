@@ -8,20 +8,10 @@ dotenv.config();
 
 const app = express();
 
-const allowedOriginPatterns = [
-  /^http:\/\/localhost:\d+$/,
-  /^https:\/\/[\w-]+\.vercel\.app$/,
-  ...(process.env.FRONTEND_URL ? [new RegExp(`^${process.env.FRONTEND_URL.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`)] : []),
-];
-
 const corsOptions = {
   origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
-    // Allow server-to-server requests (no origin) and matched origins
-    if (!origin || allowedOriginPatterns.some((p) => p.test(origin))) {
-      callback(null, true);
-    } else {
-      callback(new Error(`CORS: origin ${origin} not allowed`));
-    }
+    // Dynamically allow any origin requesting access (required when credentials are true)
+    callback(null, true);
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
