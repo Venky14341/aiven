@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const BASE_URL = `${import.meta.env.VITE_API_URL || '/api'}/auth`;
+const BASE_URL = `${import.meta.env.VITE_API_URL || ''}/api/auth`;
 
 const TOKEN_KEY = 'aivenky_token';
 const USER_KEY = 'aivenky_user';
