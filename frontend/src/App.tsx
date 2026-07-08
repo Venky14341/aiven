@@ -124,7 +124,7 @@ function App() {
   const [loading, setLoading]             = useState(false);
   const [report, setReport]               = useState<ResearchReport | null>(null);
   const [error, setError]                 = useState('');
-  const [userName, setUserName]           = useState<string | null>(null);
+  const [userName, setUserName]           = useState<string | null>('Demo User');
   const [activeSection, setActiveSection] = useState<SectionId>('overview');
   const [activeNav, setActiveNav]         = useState<NavTab>('home');
   const [showUserMenu, setShowUserMenu]   = useState(false);
@@ -238,7 +238,7 @@ function App() {
     setReport(null);
     setError('');
     authService.logout();
-    setUserName('logged-out');
+    setUserName('Demo User');
     setActiveNav('home');
   };
 
