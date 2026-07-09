@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import dashboardPreview from '../assets/images/dashboard_preview.png';
+import aiAnalysis from '../assets/images/ai_analysis.png';
 
 interface HomeTabProps {
   userName: string;
@@ -240,6 +241,64 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
               </div>
             );
           })}
+        </div>
+      </section>
+
+      {/* Nova Intelligence Grid (AI Agents flow) */}
+      <section className="glass" style={{ borderRadius: '20px', padding: '28px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid var(--border)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '24px', alignItems: 'center' }}>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="badge badge-electric">🧠 Multi-Agent Flow</div>
+            <h3 style={{ fontSize: '1.4rem', fontWeight: 800 }}>Nova AI Agent Network</h3>
+            <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+              Aivenky Nova employs a synchronized network of three specialized AI agents to generate deep reports:
+            </p>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '6px' }}>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1.2rem', padding: '4px', borderRadius: '6px', background: 'rgba(52,211,153,0.1)', color: 'var(--emerald)', flexShrink: 0 }}>📈</span>
+                <div>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: 700 }}>Fundamental Analysis Agent</h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Scans balance sheets, income statements, margins, and valuation metrics.</p>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1.2rem', padding: '4px', borderRadius: '6px', background: 'rgba(167,139,250,0.1)', color: 'var(--violet)', flexShrink: 0 }}>💬</span>
+                <div>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: 700 }}>Market Sentiment Agent</h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Gathers financial news, social momentum, and analyst consensus ratings.</p>
+                </div>
+              </div>
+              
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'flex-start' }}>
+                <span style={{ fontSize: '1.2rem', padding: '4px', borderRadius: '6px', background: 'rgba(251,113,133,0.1)', color: 'var(--rose)', flexShrink: 0 }}>⚡</span>
+                <div>
+                  <h4 style={{ fontSize: '0.85rem', fontWeight: 700 }}>Risk Evaluation Agent</h4>
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Identifies regulatory threats, market saturation, and operational hurdles.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <div style={{
+              width: '100%', maxWidth: '420px', borderRadius: '16px', overflow: 'hidden',
+              boxShadow: '0 12px 32px rgba(0,0,0,0.5)', border: '1px solid rgba(255,255,255,0.06)',
+              background: 'var(--surface-3)', transition: 'transform 0.3s'
+            }}
+              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1.01) translateY(-2px)'; }}
+              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1) translateY(0)'; }}
+            >
+              <img
+                src={aiAnalysis}
+                alt="Nova AI Agent Analysis flow diagram"
+                style={{ width: '100%', height: 'auto', display: 'block', objectFit: 'cover' }}
+              />
+            </div>
+          </div>
+          
         </div>
       </section>
 

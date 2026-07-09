@@ -22,6 +22,10 @@ export const MarketDetailsModal = ({ isOpen, onClose, market, onAnalyze }: Marke
   const [tickerPrice, setTickerPrice] = useState<string>('');
   const [tickerChange, setTickerChange] = useState<string>('');
   const [isUpState, setIsUpState] = useState<boolean>(true);
+  const [activeTab, setActiveTab] = useState<'technicals' | 'trade'>('technicals');
+  const [tradeType, setTradeType] = useState<'buy' | 'sell'>('buy');
+  const [tradeAmount, setTradeAmount] = useState<string>('1');
+  const [tradeSuccess, setTradeSuccess] = useState<boolean>(false);
 
   // Generate mock historical chart data when modal opens
   useEffect(() => {
@@ -251,52 +255,171 @@ export const MarketDetailsModal = ({ isOpen, onClose, market, onAnalyze }: Marke
           )}
         </div>
 
-        {/* Technical Stats Grid */}
-        <div style={{
-          padding: '24px', background: 'var(--surface-1)', borderTop: '1px solid var(--border)',
-          borderBottom: '1px solid var(--border)', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px'
-        }}>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Prev Open</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '4px' }}>{openPrice}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Daily High</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px' }}>{highPrice}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Daily Low</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px' }}>{lowPrice}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Vol (24h)</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '4px' }}>{volume}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Market Cap</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '4px' }}>{mcap}</div>
-          </div>
-          <div>
-            <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>AI Confidence</div>
-            <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--gold)', marginTop: '4px' }}>92%</div>
-          </div>
-        </div>
-
-        {/* Footer Actions */}
-        <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        {/* Tab Selector */}
+        <div style={{ display: 'flex', borderTop: '1px solid var(--border)', background: 'var(--surface-1)' }}>
           <button
             type="button"
-            onClick={handleResearchClick}
-            className="btn-primary"
-            style={{ width: '100%', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-          >
-            🤖 Generate AI Research Report
-          </button>
-          
-          <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.5 }}>
-            Interactive charts represent simulated market movement. Click above to trigger deep fundamental analysis and trading insights powered by Gemini.
-          </p>
+            onClick={() => { setActiveTab('technicals'); setTradeSuccess(false); }}
+            style={{
+              flex: 1, padding: '12px', fontSize: '0.8rem', fontWeight: 600,
+              color: activeTab === 'technicals' ? 'var(--electric)' : 'var(--text-secondary)',
+              background: activeTab === 'technicals' ? 'rgba(0,212,255,0.05)' : 'transparent',
+              border: 'none', borderBottom: `2px solid ${activeTab === 'technicals' ? 'var(--electric)' : 'transparent'}`,
+              cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s', outline: 'none'
+            }}
+          >📊 Overview & Stats</button>
+          <button
+            type="button"
+            onClick={() => setActiveTab('trade')}
+            style={{
+              flex: 1, padding: '12px', fontSize: '0.8rem', fontWeight: 600,
+              color: activeTab === 'trade' ? 'var(--violet)' : 'var(--text-secondary)',
+              background: activeTab === 'trade' ? 'rgba(167,139,250,0.05)' : 'transparent',
+              border: 'none', borderBottom: `2px solid ${activeTab === 'trade' ? 'var(--violet)' : 'transparent'}`,
+              cursor: 'pointer', fontFamily: 'Inter, sans-serif', transition: 'all 0.2s', outline: 'none'
+            }}
+          >⚡ Trade Simulator</button>
         </div>
+
+        {activeTab === 'technicals' ? (
+          <>
+            {/* Technical Stats Grid */}
+            <div style={{
+              padding: '24px', background: 'var(--surface-2)', borderBottom: '1px solid var(--border)',
+              display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '16px'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Prev Open</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '4px' }}>{openPrice}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Daily High</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px' }}>{highPrice}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Daily Low</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-primary)', marginTop: '4px' }}>{lowPrice}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Vol (24h)</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '4px' }}>{volume}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>Market Cap</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--text-secondary)', marginTop: '4px' }}>{mcap}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600, letterSpacing: '0.05em' }}>AI Confidence</div>
+                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--gold)', marginTop: '4px' }}>94%</div>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              <button
+                type="button"
+                onClick={handleResearchClick}
+                className="btn-primary"
+                style={{ width: '100%', padding: '14px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
+              >
+                🤖 Generate AI Research Report
+              </button>
+              
+              <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textAlign: 'center', lineHeight: 1.5 }}>
+                Interactive charts represent simulated market movement. Click above to trigger deep fundamental analysis and trading insights powered by Gemini.
+              </p>
+            </div>
+          </>
+        ) : (
+          /* Simulated Trading Panel */
+          <div style={{ padding: '24px', background: 'var(--surface-2)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {tradeSuccess ? (
+              <div className="animate-fade-in" style={{
+                textAlign: 'center', padding: '20px', display: 'flex', flexDirection: 'column',
+                alignItems: 'center', gap: '10px', background: 'rgba(52,211,153,0.06)',
+                border: '1px solid rgba(52,211,153,0.2)', borderRadius: '14px'
+              }}>
+                <span style={{ fontSize: '2.5rem' }}>✅</span>
+                <h4 style={{ color: 'var(--emerald)', fontWeight: 800 }}>Order Executed Successfully</h4>
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  Simulated order to {tradeType.toUpperCase()} {tradeAmount} {market.ticker || market.name} filled at market price.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setTradeSuccess(false)}
+                  style={{
+                    marginTop: '8px', padding: '6px 14px', background: 'var(--surface-3)',
+                    border: '1px solid var(--border)', borderRadius: '6px', cursor: 'pointer',
+                    fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-primary)'
+                  }}
+                >New Trade</button>
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'flex', gap: '8px' }}>
+                  <button
+                    type="button"
+                    onClick={() => setTradeType('buy')}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid ' + (tradeType === 'buy' ? 'var(--emerald)' : 'var(--border)'),
+                      background: tradeType === 'buy' ? 'rgba(52,211,153,0.1)' : 'transparent',
+                      color: tradeType === 'buy' ? 'var(--emerald)' : 'var(--text-muted)',
+                      fontWeight: 700, cursor: 'pointer', outline: 'none'
+                    }}
+                  >BUY</button>
+                  <button
+                    type="button"
+                    onClick={() => setTradeType('sell')}
+                    style={{
+                      flex: 1, padding: '10px', borderRadius: '8px', border: '1px solid ' + (tradeType === 'sell' ? 'var(--rose)' : 'var(--border)'),
+                      background: tradeType === 'sell' ? 'rgba(251,113,133,0.1)' : 'transparent',
+                      color: tradeType === 'sell' ? 'var(--rose)' : 'var(--text-muted)',
+                      fontWeight: 700, cursor: 'pointer', outline: 'none'
+                    }}
+                  >SELL</button>
+                </div>
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <label style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 700, textTransform: 'uppercase' }}>Quantity</label>
+                  <input
+                    type="number"
+                    min="0.0001"
+                    value={tradeAmount}
+                    onChange={e => setTradeAmount(e.target.value)}
+                    style={{
+                      background: 'var(--surface-1)', border: '1px solid var(--border)', borderRadius: '8px',
+                      padding: '10px 12px', color: 'var(--text-primary)', outline: 'none', fontSize: '0.88rem'
+                    }}
+                  />
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                  <span>Est. Market Price:</span>
+                  <span className="font-mono" style={{ fontWeight: 700 }}>{tickerPrice}</span>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  <span>Est. Total Cost:</span>
+                  <span className="font-mono" style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
+                    {((parseFloat(tradeAmount) || 0) * (parseFloat(tickerPrice.replace(/,/g, '')) || 0)).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setTradeSuccess(true)}
+                  style={{
+                    marginTop: '8px', padding: '12px', background: tradeType === 'buy' ? 'var(--emerald)' : 'var(--rose)',
+                    color: '#000', fontWeight: 800, border: 'none', borderRadius: '8px', cursor: 'pointer',
+                    fontSize: '0.85rem'
+                  }}
+                >
+                  Confirm simulated {tradeType.toUpperCase()}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
 
       </div>
     </div>
