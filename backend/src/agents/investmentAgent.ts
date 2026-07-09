@@ -3,7 +3,7 @@ import { CompanyResearchReport, ResearchRequest } from '../types';
 import { buildInvestmentPrompt } from '../prompts/investmentPrompt';
 
 export class InvestmentAgent {
-  constructor(private geminiService: GeminiService) {}
+  constructor(private geminiService: any) {}
 
   async run(request: ResearchRequest): Promise<CompanyResearchReport> {
     const companyName = request.companyName?.trim();

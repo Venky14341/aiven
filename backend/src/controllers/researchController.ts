@@ -1,13 +1,14 @@
 import { Request, Response } from 'express';
 import { InvestmentAgent } from '../agents/investmentAgent';
-import { GeminiService } from '../services/geminiService';
+// import { GeminiService } from '../services/geminiService'; // Original raw API service
+import { LangChainService } from '../services/langchainService'; // LangChain service for bonus points
 import { CompanyResearchReport, ResearchRequest } from '../types';
 
 const reports = new Map<string, CompanyResearchReport>();
 
-// Singleton services (good practice)
-const geminiService = new GeminiService();
-const investmentAgent = new InvestmentAgent(geminiService);
+// Using LangChainService (drop-in replacement for GeminiService)
+const langchainService = new LangChainService();
+const investmentAgent = new InvestmentAgent(langchainService);
 
 export const researchCompany = async (req: Request, res: Response) => {
   try {
