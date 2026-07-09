@@ -36,9 +36,166 @@ const TICKER_ITEMS = [
   { symbol: 'INFY', price: '$18.45', change: '-0.30%', up: false },
 ];
 
+/* ── Strategy Data ── */
+interface Allocation {
+  name: string;
+  pct: number;
+  color: string;
+}
+
+interface StrategyConfig {
+  label: string;
+  desc: string;
+  allocations: Allocation[];
+  estReturn: string;
+  riskRating: string;
+  recommended: string[];
+}
+
+const STRATEGIES: Record<'defensive' | 'balanced' | 'moonshot', StrategyConfig> = {
+  defensive: {
+    label: 'Defensive Anchor',
+    desc: 'Capital preservation focused. Maximizes exposure to gold-chip treasuries and value cash cows.',
+    allocations: [
+      { name: 'US Treasuries', pct: 40, color: 'var(--gold)' },
+      { name: 'Mega Cap Tech', pct: 30, color: 'var(--electric)' },
+      { name: 'Dividend Value', pct: 20, color: 'var(--emerald)' },
+      { name: 'Hedging Cash', pct: 10, color: 'var(--text-muted)' },
+    ],
+    estReturn: '4.8% - 6.2%',
+    riskRating: 'Low Risk',
+    recommended: ['MSFT', 'AAPL', 'JNJ', 'PG'],
+  },
+  balanced: {
+    label: 'AI-Enhanced Growth',
+    desc: 'Balanced risk-adjusted returns. Blends growth equities with robust machine-learning signals.',
+    allocations: [
+      { name: 'AI Growth Stocks', pct: 45, color: 'var(--electric)' },
+      { name: 'Global Equities', pct: 25, color: 'var(--emerald)' },
+      { name: 'Government Bonds', pct: 20, color: 'var(--gold)' },
+      { name: 'Commodities/Gold', pct: 10, color: 'var(--violet)' },
+    ],
+    estReturn: '9.5% - 12.8%',
+    riskRating: 'Medium Risk',
+    recommended: ['NVDA', 'AAPL', 'AMZN', 'GOOGL'],
+  },
+  moonshot: {
+    label: 'Alpha Moonshot',
+    desc: 'Aggressive portfolio geared towards disruptive AI protocols and early secular transformations.',
+    allocations: [
+      { name: 'Disruptive Tech', pct: 55, color: 'var(--rose)' },
+      { name: 'Web3 / Digital Assets', pct: 25, color: 'var(--violet)' },
+      { name: 'AI Scaleups', pct: 15, color: 'var(--electric)' },
+      { name: 'Option Collars', pct: 5, color: 'var(--gold)' },
+    ],
+    estReturn: '18.0% - 24.5%',
+    riskRating: 'High Risk',
+    recommended: ['NVDA', 'TSLA', 'PLTR', 'COIN'],
+  },
+};
+
+/* ── Matchup Data ── */
+interface VsMetric {
+  name: string;
+  leftVal: number; // out of 100
+  rightVal: number; // out of 100
+}
+
+interface MatchupConfig {
+  leftName: string;
+  rightName: string;
+  leftTicker: string;
+  rightTicker: string;
+  metrics: VsMetric[];
+  consensus: string;
+}
+
+const MATCHUPS: Record<'nvda_amd' | 'aapl_msft' | 'tsla_byd', MatchupConfig> = {
+  nvda_amd: {
+    leftName: 'NVIDIA', leftTicker: 'NVDA',
+    rightName: 'AMD', rightTicker: 'AMD',
+    consensus: 'NVIDIA leads in core datacenter architecture; AMD is catching up via competitive pricing.',
+    metrics: [
+      { name: 'AI Hardware Moat', leftVal: 96, rightVal: 72 },
+      { name: 'Valuation Premium', leftVal: 45, rightVal: 60 },
+      { name: 'AI Sentiment Index', leftVal: 92, rightVal: 84 },
+      { name: 'Revenue Growth YoY', leftVal: 98, rightVal: 68 },
+    ],
+  },
+  aapl_msft: {
+    leftName: 'Apple', leftTicker: 'AAPL',
+    rightName: 'Microsoft', rightTicker: 'MSFT',
+    consensus: 'Microsoft holds enterprise software AI leads; Apple has edge in edge-AI hardware integration.',
+    metrics: [
+      { name: 'Enterprise Moat', leftVal: 75, rightVal: 94 },
+      { name: 'Cash Reserves Score', leftVal: 95, rightVal: 90 },
+      { name: 'AI Growth Trajectory', leftVal: 70, rightVal: 92 },
+      { name: 'Consumer Loyalty', leftVal: 98, rightVal: 80 },
+    ],
+  },
+  tsla_byd: {
+    leftName: 'Tesla', leftTicker: 'TSLA',
+    rightName: 'BYD Co', rightTicker: 'BYD',
+    consensus: 'Tesla dominates autonomous network FSD models; BYD excels in high-volume, low-margin battery scale.',
+    metrics: [
+      { name: 'FSD Autonomy Tech', leftVal: 94, rightVal: 55 },
+      { name: 'Production Efficiency', leftVal: 82, rightVal: 90 },
+      { name: 'Brand Leverage', leftVal: 95, rightVal: 74 },
+      { name: 'Margin Resiliency', leftVal: 65, rightVal: 82 },
+    ],
+  },
+};
+
+/* ── Sentiment Category Data ── */
+interface CompassDetail {
+  score: number;
+  status: string;
+  color: string;
+  drivers: string[];
+}
+
+const COMPASS_SECTIONS: Record<'equities' | 'crypto' | 'macro', CompassDetail> = {
+  equities: {
+    score: 76,
+    status: 'Greed',
+    color: 'var(--emerald)',
+    drivers: [
+      'Strong forward semiconductor earnings',
+      'Fed interest rate cut cycles expected',
+      'Resilient labor market indices',
+    ],
+  },
+  crypto: {
+    score: 62,
+    status: 'Mild Greed',
+    color: 'var(--violet)',
+    drivers: [
+      'Stablecoin inflows reach multi-month highs',
+      'Halving supply constraints beginning to squeeze',
+      'Regulatory compliance policies clarifying',
+    ],
+  },
+  macro: {
+    score: 45,
+    status: 'Fear',
+    color: 'var(--rose)',
+    drivers: [
+      'Inflation stabilization headwinds',
+      'Elevated regional commercial real estate exposure',
+      'Global energy freight corridor bottlenecks',
+    ],
+  },
+};
+
 export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
   const [searchVal, setSearchVal] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
+  
+  // Custom states for interactive panels
+  const [strategy, setStrategy] = useState<'defensive' | 'balanced' | 'moonshot'>('balanced');
+  const [matchup, setMatchup] = useState<'nvda_amd' | 'aapl_msft' | 'tsla_byd'>('nvda_amd');
+  const [compassCat, setCompassCat] = useState<'equities' | 'crypto' | 'macro'>('equities');
+
   const [typingIndex, setTypingIndex] = useState(0);
   const [typedText, setTypedText] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -138,6 +295,10 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
     { title: 'Treasury yields stabilize as inflation reports align with long-term forecasts.', type: 'neutral', icon: '📊', detail: 'Consensus builds around Fed easing rates late Q3.' },
     { title: 'Supply chain headwinds signal margin pressure for automotive and consumer electronics.', type: 'bearish', icon: '⚠️', detail: 'Higher container freight rates impacting input costs.' }
   ];
+
+  const curStrat = STRATEGIES[strategy];
+  const curMatch = MATCHUPS[matchup];
+  const curCompass = COMPASS_SECTIONS[compassCat];
 
   return (
     <div className="animate-fade-up" style={{ display: 'flex', flexDirection: 'column', gap: '36px', position: 'relative' }}>
@@ -391,7 +552,7 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
                 <button
                   key={stock.name}
                   type="button"
-                  onClick={() => onResearch(stock.name)}
+                  onClick={() => onResearch(stock.ticker)}
                   style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%',
                     padding: '14px 18px', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)',
@@ -439,60 +600,301 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
 
       </div>
 
-      {/* ═══ AI MARKET SENTIMENT HUB ═══ */}
-      <section className="glass animate-card-entrance" style={{ borderRadius: '24px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px', zIndex: 1 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+      {/* ═══ INTERACTIVE PORTFOLIO STRATEGY SIMULATOR & COMPASS GAUGE ═══ */}
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', zIndex: 1 }} className="home-hero-grid">
+        
+        {/* Module A: Strategy Simulator */}
+        <section className="glass border-animated" style={{ borderRadius: '24px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+          <div>
+            <div className="section-label" style={{ marginBottom: '4px' }}>ALLOCATION ENGINE</div>
+            <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>Portfolio Strategy Allocator</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '3px' }}>Simulate asset strategies mapped to target metrics and recommended symbols.</p>
+          </div>
+
+          {/* Strategy Tabs */}
+          <div style={{ display: 'flex', background: 'rgba(8,12,26,0.6)', borderRadius: '12px', padding: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            {(['defensive', 'balanced', 'moonshot'] as const).map(tab => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setStrategy(tab)}
+                style={{
+                  flex: 1, padding: '10px 8px', borderRadius: '8px', border: 'none',
+                  fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.25s',
+                  background: strategy === tab ? 'linear-gradient(135deg, rgba(0,212,255,0.12), rgba(167,139,250,0.1))' : 'transparent',
+                  color: strategy === tab ? 'var(--text-primary)' : 'var(--text-muted)',
+                }}
+              >
+                {tab === 'defensive' ? '🛡️ Defensive' : tab === 'balanced' ? '⚖️ Balanced' : '🚀 Moonshot'}
+              </button>
+            ))}
+          </div>
+
+          {/* Active Strategy Output */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span style={{ fontSize: '0.92rem', fontWeight: 800, color: 'var(--text-primary)' }}>{curStrat.label}</span>
+                <span className="badge badge-gold" style={{ fontSize: '0.65rem' }}>{curStrat.riskRating}</span>
+              </div>
+              <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                {curStrat.desc}
+              </p>
+            </div>
+
+            {/* Segmented allocation bar visual */}
+            <div style={{ display: 'flex', height: '14px', borderRadius: '99px', overflow: 'hidden', background: 'rgba(255,255,255,0.02)' }}>
+              {curStrat.allocations.map(al => (
+                <div
+                  key={al.name}
+                  style={{ width: `${al.pct}%`, background: al.color, height: '100%' }}
+                  title={`${al.name}: ${al.pct}%`}
+                />
+              ))}
+            </div>
+
+            {/* Legend grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px 16px' }}>
+              {curStrat.allocations.map(al => (
+                <div key={al.name} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: al.color }} />
+                  <span style={{ flex: 1 }}>{al.name}</span>
+                  <span className="font-mono" style={{ fontWeight: 700, color: 'var(--text-primary)' }}>{al.pct}%</span>
+                </div>
+              ))}
+            </div>
+
+            {/* Simulated returns / actions */}
+            <div style={{
+              display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+              padding: '12px 16px', background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)',
+              borderRadius: '12px', marginTop: 'auto'
+            }}>
+              <div>
+                <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>ESTIMATED TARGET RETURNS</div>
+                <div className="font-mono text-gradient-electric" style={{ fontSize: '1.15rem', fontWeight: 900, marginTop: '2px' }}>{curStrat.estReturn}</div>
+              </div>
+              <div style={{ display: 'flex', gap: '6px' }}>
+                {curStrat.recommended.map(rec => (
+                  <button
+                    key={rec}
+                    onClick={() => onResearch(rec)}
+                    style={{
+                      background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)',
+                      borderRadius: '6px', padding: '6px 10px', fontSize: '0.7rem', color: 'var(--text-primary)',
+                      fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s'
+                    }}
+                    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--electric)'; (e.currentTarget as HTMLElement).style.background = 'rgba(0,212,255,0.05)'; }}
+                    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'rgba(255,255,255,0.06)'; (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.03)'; }}
+                  >
+                    🔍 {rec}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Module B: Stock Vs Battle Station */}
+        <section className="glass border-animated" style={{ borderRadius: '24px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+            <div>
+              <div className="section-label" style={{ marginBottom: '4px' }}>AI STOCK COMPARE</div>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: 800 }}>AI Stock Comparison Station</h3>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '3px' }}>Compare key metrics, AI sentiments, and moats side-by-side.</p>
+            </div>
+          </div>
+
+          {/* Matchup Tabs */}
+          <div style={{ display: 'flex', background: 'rgba(8,12,26,0.6)', borderRadius: '12px', padding: '4px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            {(['nvda_amd', 'aapl_msft', 'tsla_byd'] as const).map(tab => (
+              <button
+                key={tab}
+                type="button"
+                onClick={() => setMatchup(tab)}
+                style={{
+                  flex: 1, padding: '10px 6px', borderRadius: '8px', border: 'none',
+                  fontSize: '0.76rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.25s',
+                  background: matchup === tab ? 'linear-gradient(135deg, rgba(0,212,255,0.12), rgba(167,139,250,0.1))' : 'transparent',
+                  color: matchup === tab ? 'var(--text-primary)' : 'var(--text-muted)',
+                }}
+              >
+                {tab === 'nvda_amd' ? 'NVDA vs AMD' : tab === 'aapl_msft' ? 'AAPL vs MSFT' : 'TSLA vs BYD'}
+              </button>
+            ))}
+          </div>
+
+          {/* Matchup metrics side by side */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flex: 1 }}>
+            
+            {/* Headers */}
+            <div style={{ display: 'flex', justifyItems: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '8px' }}>
+              <button onClick={() => onResearch(curMatch.leftTicker)} style={{ flex: 1, textAlign: 'left', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+                <span className="text-gradient-electric" style={{ fontSize: '1rem', fontWeight: 800 }}>{curMatch.leftName}</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: '6px' }}>({curMatch.leftTicker})</span>
+              </button>
+              <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: 800, padding: '0 10px' }}>VS</span>
+              <button onClick={() => onResearch(curMatch.rightTicker)} style={{ flex: 1, background: 'none', border: 'none', cursor: 'pointer', padding: 0, textAlign: 'right' }}>
+                <span className="text-gradient-gold" style={{ fontSize: '1rem', fontWeight: 800 }}>{curMatch.rightName}</span>
+                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginLeft: '6px' }}>({curMatch.rightTicker})</span>
+              </button>
+            </div>
+
+            {/* Metrics List */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {curMatch.metrics.map(m => (
+                <div key={m.name} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.76rem', fontWeight: 600 }}>
+                    <span style={{ color: 'var(--emerald)', fontFamily: 'JetBrains Mono, monospace' }}>{m.leftVal}%</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>{m.name}</span>
+                    <span style={{ color: 'var(--gold)', fontFamily: 'JetBrains Mono, monospace' }}>{m.rightVal}%</span>
+                  </div>
+                  
+                  {/* Segmented slider gauge */}
+                  <div style={{ display: 'flex', gap: '4px', height: '6px' }}>
+                    <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: '4px', overflow: 'hidden', display: 'flex', justifyContent: 'flex-end' }}>
+                      <div style={{ width: `${m.leftVal}%`, background: 'linear-gradient(90deg, transparent, var(--electric))', height: '100%', borderRadius: '4px' }} />
+                    </div>
+                    <div style={{ flex: 1, background: 'rgba(255,255,255,0.02)', borderRadius: '4px', overflow: 'hidden' }}>
+                      <div style={{ width: `${m.rightVal}%`, background: 'linear-gradient(90deg, var(--gold), transparent)', height: '100%', borderRadius: '4px' }} />
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* AI consensus */}
+            <div style={{
+              background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)',
+              borderRadius: '12px', padding: '12px 14px', fontSize: '0.74rem', color: 'var(--text-secondary)',
+              lineHeight: 1.5, marginTop: 'auto'
+            }}>
+              💡 <strong style={{ color: 'var(--text-primary)' }}>AI Analyst Consensus:</strong> {curMatch.consensus}
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+
+      {/* ═══ AI MARKET SENTIMENT HUB & COMPASS ═══ */}
+      <section className="glass animate-card-entrance" style={{ borderRadius: '24px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '24px', zIndex: 1 }}>
+        
+        {/* Header with Compass tabs */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', borderBottom: '1px solid rgba(255,255,255,0.04)', paddingBottom: '16px' }}>
           <div>
             <div className="section-label" style={{ marginBottom: '4px' }}>SENTIMENT ENGINE</div>
-            <h3 style={{ fontSize: '1.35rem', fontWeight: 800 }}>Global AI Sentiment Digest</h3>
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800 }}>Global AI Sentiment Compass</h3>
           </div>
-          <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', fontWeight: 600 }}>OVERALL SCORE:</span>
-            <span className="badge badge-emerald" style={{ padding: '6px 14px', letterSpacing: '0.05em' }}>🟢 76 - BULLISH</span>
+          
+          <div style={{ display: 'flex', gap: '8px', background: 'rgba(8,12,26,0.6)', padding: '4px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.05)' }}>
+            {(['equities', 'crypto', 'macro'] as const).map(cat => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setCompassCat(cat)}
+                style={{
+                  padding: '6px 12px', borderRadius: '8px', border: 'none',
+                  fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+                  background: compassCat === cat ? 'rgba(255,255,255,0.04)' : 'transparent',
+                  color: compassCat === cat ? 'var(--text-primary)' : 'var(--text-muted)'
+                }}
+              >
+                {cat.toUpperCase()}
+              </button>
+            ))}
           </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-          {sentimentHighlights.map((item) => {
-            const badgeColor = item.type === 'bullish' ? 'var(--emerald)' : item.type === 'bearish' ? 'var(--rose)' : 'var(--text-secondary)';
-            return (
-              <div key={item.title} className="heatmap-card" style={{
-                background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)',
-                borderRadius: '18px', padding: '24px', display: 'flex', flexDirection: 'column',
-                gap: '12px', transition: 'all 0.3s cubic-bezier(0.25, 1, 0.5, 1)',
-                position: 'relative'
-              }}
-                onMouseEnter={e => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(-4px)';
-                  (e.currentTarget as HTMLElement).style.borderColor = `${badgeColor}30`;
-                  (e.currentTarget as HTMLElement).style.boxShadow = `0 12px 30px rgba(0,0,0,0.5), 0 0 25px ${badgeColor}05`;
-                }}
-                onMouseLeave={e => {
-                  (e.currentTarget as HTMLElement).style.transform = 'translateY(0)';
-                  (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)';
-                  (e.currentTarget as HTMLElement).style.boxShadow = 'none';
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '1.6rem' }}>{item.icon}</span>
-                  <span className="badge" style={{
-                    background: `${badgeColor}15`, color: badgeColor,
-                    border: `1px solid ${badgeColor}25`, fontSize: '0.68rem', letterSpacing: '0.08em'
-                  }}>
-                    {item.type}
-                  </span>
+        {/* Compass main display grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: '0.8fr 1.2fr', gap: '30px', alignItems: 'center' }} className="home-hero-grid">
+          
+          {/* Left panel: Compass dial */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative', padding: '10px' }}>
+            
+            {/* Round dial SVG gauge */}
+            <svg width="220" height="220" viewBox="0 0 200 200">
+              {/* Dial Arc Background */}
+              <path
+                d="M 40,160 A 75,75 0 1,1 160,160"
+                fill="none"
+                stroke="rgba(255,255,255,0.03)"
+                strokeWidth="14"
+                strokeLinecap="round"
+              />
+              {/* Dial Active Arc */}
+              <path
+                d="M 40,160 A 75,75 0 1,1 160,160"
+                fill="none"
+                stroke={curCompass.color}
+                strokeWidth="14"
+                strokeLinecap="round"
+                strokeDasharray="360"
+                strokeDashoffset={360 - (360 * curCompass.score) / 100}
+                style={{ transition: 'stroke-dashoffset 1s ease-out, stroke 0.5s' }}
+              />
+              
+              {/* Center pointer needle pin */}
+              <circle cx="100" cy="100" r="8" fill="var(--text-primary)" />
+              {/* Pointer needle line */}
+              <line
+                x1="100" y1="100"
+                x2="100" y2="40"
+                stroke="var(--text-primary)"
+                strokeWidth="3"
+                strokeLinecap="round"
+                transform={`rotate(${(curCompass.score / 100) * 240 - 120} 100 100)`}
+                style={{ transformOrigin: '100px 100px', transition: 'transform 1s cubic-bezier(0.25, 1, 0.5, 1)' }}
+              />
+            </svg>
+
+            {/* Text Overlay in Dial Center */}
+            <div style={{ position: 'absolute', bottom: '26px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <span style={{ fontSize: '1.9rem', fontWeight: 900, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>{curCompass.score}</span>
+              <span style={{ fontSize: '0.74rem', fontWeight: 700, color: curCompass.color, textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '2px' }}>
+                {curCompass.status}
+              </span>
+            </div>
+          </div>
+
+          {/* Right panel: Sentiment details and positive/negative cards */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <div>
+              <h4 style={{ fontSize: '0.98rem', fontWeight: 800, color: 'var(--text-primary)' }}>Key Market Drivers</h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+                InvestIQ sentiment classifiers derived these key drivers within the last 2 hours.
+              </p>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {curCompass.drivers.map((drv) => (
+                <div key={drv} style={{
+                  display: 'flex', gap: '10px', alignItems: 'center', padding: '12px 16px',
+                  background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)',
+                  borderRadius: '12px', fontSize: '0.78rem', color: 'var(--text-secondary)'
+                }}>
+                  <span style={{ color: curCompass.color }}>✔</span>
+                  <span>{drv}</span>
                 </div>
-                
-                <h4 style={{ fontSize: '0.88rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.5 }}>
-                  {item.title}
-                </h4>
-                
-                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', lineHeight: 1.5, marginTop: 'auto', borderTop: '1px solid rgba(255,255,255,0.04)', paddingTop: '10px' }}>
-                  {item.detail}
-                </p>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+
+            {/* Sentiment Headline Highlights slider */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px', marginTop: '6px' }}>
+              {sentimentHighlights.slice(0, 2).map((item, idx) => (
+                <div key={idx} style={{
+                  background: 'rgba(255,255,255,0.01)', border: '1px solid var(--border)',
+                  borderRadius: '14px', padding: '14px', display: 'flex', gap: '10px'
+                }}>
+                  <span style={{ fontSize: '1.25rem' }}>{item.icon}</span>
+                  <div>
+                    <h5 style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1.4 }}>{item.title}</h5>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </section>
 
