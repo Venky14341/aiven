@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/userModel';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'aivenky-default-secret-change-me';
+const JWT_SECRET = process.env.JWT_SECRET || 'investiq-default-secret-change-me';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '7d';
 
 function signToken(payload: { id: string; email: string; name: string }): string {
@@ -92,7 +92,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
 
 // POST /api/auth/demo
 export const demoLogin = async (_req: Request, res: Response): Promise<void> => {
-  const demoUser = { id: 'demo-user', email: 'demo@aivenky.com', name: 'Investor' };
+  const demoUser = { id: 'demo-user', email: 'demo@investiq.com', name: 'Investor' };
   const token = signToken(demoUser);
 
   res.json({

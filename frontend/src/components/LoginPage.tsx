@@ -270,9 +270,9 @@ export const LoginPage = ({ onLogin }: LoginPageProps) => {
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '26px', fontWeight: 900, color: '#000',
               boxShadow: '0 0 40px -10px rgba(240,180,41,0.5)',
-            }}>A</div>
+            }}>I</div>
             <div>
-              <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>Aivenky Nova</div>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, letterSpacing: '0.25em', textTransform: 'uppercase', color: 'var(--text-muted)' }}>InvestIQ</div>
               <div style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)' }}>Investment Intelligence</div>
             </div>
           </div>

@@ -3,7 +3,7 @@ import app from './app';
 import { config } from './config/env';
 
 const host = process.env.HOST || '0.0.0.0';
-const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/aivenky';
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/investiq';
 
 mongoose.connect(mongoUri)
   .then(() => {

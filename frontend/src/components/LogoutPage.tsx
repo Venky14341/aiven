@@ -71,7 +71,7 @@ export const LogoutPage = ({ onRedirect }: LogoutPageProps) => {
             Safely Logged Out
           </h2>
           <p style={{ fontSize: '0.88rem', color: 'var(--text-secondary)' }}>
-            Thank you for using Aivenky Nova. Your research session has been secured.
+            Thank you for using InvestIQ. Your research session has been secured.
           </p>
         </div>
 

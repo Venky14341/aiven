@@ -369,7 +369,7 @@ function App() {
             style={{ display: 'flex', alignItems: 'center', gap: '10px', flexShrink: 0, background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}
           >
             <div style={{
-              width: '36px', height: '36px', borderRadius: '10px',
+              width: '36px', height: '36px', borderRadius: '12px',
               background: 'linear-gradient(135deg, var(--gold-light), var(--gold))',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               fontSize: '18px', fontWeight: 900, color: '#000',
@@ -377,9 +377,9 @@ function App() {
             }}
               onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1.08)'; (e.currentTarget as HTMLElement).style.boxShadow = '0 0 20px rgba(240,180,41,0.5)'; }}
               onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = 'scale(1)'; (e.currentTarget as HTMLElement).style.boxShadow = 'none'; }}
-            >A</div>
+            >I</div>
             <div style={{ textAlign: 'left' }}>
-              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>Aivenky Nova</div>
+              <div style={{ fontSize: '0.95rem', fontWeight: 800, color: 'var(--text-primary)', lineHeight: 1 }}>InvestIQ</div>
               <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 500 }}>Investment Intelligence</div>
             </div>
           </button>
@@ -1004,7 +1004,7 @@ function App() {
           ))}
         </div>
         <p style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '10px' }}>
-          © 2025 Aivenky Nova · AI-generated research for informational purposes only · Not financial advice
+          © 2025 InvestIQ · AI-generated research for informational purposes only · Not financial advice
         </p>
       </footer>
 

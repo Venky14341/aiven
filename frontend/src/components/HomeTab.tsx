@@ -200,7 +200,7 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
             </h1>
             
             <p style={{ fontSize: '0.96rem', color: 'var(--text-secondary)', lineHeight: 1.7, maxWidth: '560px' }}>
-              Welcome back, <strong style={{ color: 'var(--text-primary)' }}>{userName}</strong>. Nova integrates real-time equity valuation, analyst consensus, and risk assessment via a collaborative, multi-agent framework powered by Gemini AI.
+              Welcome back, <strong style={{ color: 'var(--text-primary)' }}>{userName}</strong>. InvestIQ integrates real-time equity valuation, analyst consensus, and risk assessment via a collaborative, multi-agent framework powered by Gemini AI.
             </p>
 
             {/* Glowing Search Bar */}
@@ -508,9 +508,9 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
               ⚙️ OPERATIONAL ARCHITECTURE
             </div>
             
-            <h3 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)' }}>Nova Multi-Agent Pipeline</h3>
+            <h3 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-primary)' }}>InvestIQ Multi-Agent Pipeline</h3>
             <p style={{ fontSize: '0.94rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-              Aivenky Nova distributes search prompts to three autonomous expert sub-agents. These agents gather disparate intelligence streams and compile a unified investment report:
+              InvestIQ distributes search prompts to three autonomous expert sub-agents. These agents gather disparate intelligence streams and compile a unified investment report:
             </p>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', marginTop: '10px' }}>
