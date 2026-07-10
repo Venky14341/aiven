@@ -1,17 +1,52 @@
-import mongoose, { Schema, Document } from 'mongoose';
+import { DataTypes, Model, Optional } from 'sequelize';
+import { sequelize } from '../config/database';
 
-export interface IUser extends Document {
+export interface UserAttributes {
+  id: number;
   email: string;
   passwordHash: string;
   name: string;
-  createdAt: Date;
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 
-const UserSchema: Schema = new Schema({
-  email: { type: String, required: true, unique: true, lowercase: true, trim: true },
-  passwordHash: { type: String, required: true },
-  name: { type: String, required: true, trim: true },
-  createdAt: { type: Date, default: Date.now },
-});
+export interface UserCreationAttributes extends Optional<UserAttributes, 'id' | 'createdAt' | 'updatedAt'> {}
 
-export default mongoose.model<IUser>('User', UserSchema);
+class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
+  public id!: number;
+  public email!: string;
+  public passwordHash!: string;
+  public name!: string;
+  public readonly createdAt!: Date;
+  public readonly updatedAt!: Date;
+}
+
+User.init(
+  {
+    id: {
+      type: DataTypes.INTEGER.UNSIGNED,
+      autoIncrement: true,
+      primaryKey: true,
+    },
+    email: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      unique: true,
+    },
+    passwordHash: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+    name: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
+  },
+  {
+    sequelize,
+    tableName: 'users',
+    timestamps: true,
+  }
+);
+
+export default User;

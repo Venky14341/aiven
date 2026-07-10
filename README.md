@@ -44,7 +44,7 @@ The frontend is a premium, dark-themed dashboard with live market tickers, globa
 
 - **Node.js** ≥ 18
 - **npm** ≥ 9
-- **MongoDB** (local or Atlas — needed for user auth persistence)
+- **MySQL** (local or hosted — needed for user auth persistence)
 - **Google Gemini API Key** — get one free at [Google AI Studio](https://aistudio.google.com/app/apikey)
 
 ### 1. Clone the Repository
@@ -69,11 +69,16 @@ GEMINI_API_KEY=your_gemini_api_key_here
 GEMINI_MODEL=gemini-flash-latest
 JWT_SECRET=your_strong_random_jwt_secret
 JWT_EXPIRES_IN=7d
-MONGODB_URI=mongodb://localhost:27017/investiq
+# MySQL Database Configuration
+MYSQL_DATABASE=investiq
+MYSQL_USER=root
+MYSQL_PASSWORD=
+MYSQL_HOST=localhost
+MYSQL_PORT=3306
 FRONTEND_URL=http://localhost:5173
 ```
 
-> **The only mandatory key is `GEMINI_API_KEY`.** Without it the backend still starts, but returns graceful "AI service unavailable" fallback reports. MongoDB is needed only if you use real registration/login (demo login works without it).
+> **The only mandatory key is `GEMINI_API_KEY`.** Without it the backend still starts, but returns graceful "AI service unavailable" fallback reports. MySQL is needed only if you use real registration/login (demo login works without it).
 
 Install dependencies and start:
 
@@ -142,7 +147,7 @@ The frontend starts at `http://localhost:5173`. The Vite dev server is pre-confi
 │  │   Chain] → [Gemini API] → [JSON Parse]   │                    │
 │  └──────────────────────────────────────────┘                    │
 │                                                                  │
-│  Auth: JWT + bcrypt + MongoDB (Mongoose)                         │
+│  Auth: JWT + bcrypt + MySQL (Sequelize)                          │
 │  Cache: In-memory Map<company, report>                           │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -155,7 +160,7 @@ The frontend starts at `http://localhost:5173`. The Vite dev server is pre-confi
 | **Backend**      | Express 4, TypeScript, ts-node-dev                      |
 | **AI Engine**    | Google Gemini (via LangChain `@langchain/google-genai`)  |
 | **AI Framework** | LangChain (LCEL chains: PromptTemplate → Model → Parser) |
-| **Auth**         | JWT, bcrypt, Mongoose (MongoDB)                          |
+| **Auth**         | JWT, bcrypt, Sequelize (MySQL)                            |
 | **Deployment**   | Vercel (frontend), Render (backend)                      |
 
 ### Key Backend Flow
@@ -189,7 +194,7 @@ This structured-output strategy ensures the frontend can reliably render each se
 | **LangChain over raw API calls** | LangChain's LCEL chain pattern (`PromptTemplate → Model → OutputParser`) is more composable, testable, and future-proof. It also earns bonus points. The raw `GeminiService` (direct `axios` to the REST API) is preserved as an alternative. |
 | **Structured JSON prompt** | Instead of free-text responses, the prompt demands a strict JSON schema. This makes frontend rendering deterministic — every section (strengths, risks, financials) maps to a typed interface. |
 | **In-memory cache (`Map`)** | For a demo/assignment, a `Map<string, Report>` is simple and fast. Eliminates redundant API calls for repeat queries. Trade-off: cache resets on server restart. |
-| **JWT auth with demo bypass** | Full auth flow (register/login) is implemented with bcrypt + JWT + MongoDB. But the middleware is currently set to **demo bypass mode** so reviewers can test instantly without MongoDB setup. |
+| **JWT auth with demo bypass** | Full auth flow (register/login) is implemented with bcrypt + JWT + MySQL. But the middleware is currently set to **demo bypass mode** so reviewers can test instantly without MySQL setup. |
 | **Custom CORS middleware** | After multiple Vercel → Render CORS issues in deployment (see git history), I replaced the `cors` npm package with a manual `Access-Control-Allow-*` middleware that dynamically reflects the request origin. More reliable for the Vercel proxy setup. |
 | **Monorepo (no workspace tools)** | `frontend/` and `backend/` live in one repo with independent `package.json` files. Simple to understand, no workspace tooling overhead. |
 | **Vite + Vercel proxy** | `vercel.json` rewrites `/api/*` to the Render backend URL. This avoids CORS entirely in production — the browser only talks to Vercel. |
@@ -200,7 +205,7 @@ This structured-output strategy ensures the frontend can reliably render each se
 | Omission | Why |
 | :--- | :--- |
 | **Real financial data APIs** (Yahoo Finance, Alpha Vantage) | The assignment focuses on AI agent architecture. Gemini's training data provides realistic-enough analysis for the demo. |
-| **Database-backed report storage** | In-memory cache is sufficient for demo. A production system would persist to MongoDB/PostgreSQL. |
+| **Database-backed report storage** | In-memory cache is sufficient for demo. A production system would persist to MySQL/PostgreSQL. |
 | **Real-time WebSocket updates** | The research call is ~8s; a loading spinner is sufficient. WebSocket streaming would improve UX for longer chains. |
 | **Unit / integration tests** | Prioritized building a complete, polished product over test coverage given the assignment scope. |
 | **Multi-agent orchestration** (true LangGraph) | The 5-step workflow is currently a single prompt that asks Gemini to perform all steps. A true LangGraph graph with separate nodes per step would be more production-grade. |
@@ -303,7 +308,7 @@ Below are example outputs from the agent for three companies. Each shows the str
 
 3. **Streaming responses** — Use Server-Sent Events (SSE) to stream the AI's analysis step-by-step to the frontend, showing each workflow stage completing in real-time.
 
-4. **Database persistence** — Replace the in-memory `Map` with MongoDB collections for reports. Add user history, saved watchlists, and report comparison.
+4. **Database persistence** — Replace the in-memory `Map` with MySQL tables/relations for reports. Add user history, saved watchlists, and report comparison.
 
 5. **RAG (Retrieval-Augmented Generation)** — Embed recent earnings call transcripts and 10-K filings into a vector store (Pinecone/ChromaDB). Use retrieval to ground the AI's analysis in factual documents rather than parametric knowledge.
 
@@ -335,7 +340,7 @@ This entire project was built with the assistance of an AI coding assistant (**G
 - Created `buildInvestmentPrompt()` with strict JSON schema instructions
 - Built `InvestmentAgent` with robust JSON parsing and graceful fallback
 - Added in-memory caching for repeat queries
-- Set up auth routes (register/login/demo) with JWT + bcrypt + MongoDB
+- Set up auth routes (register/login/demo) with JWT + bcrypt + MySQL
 
 ### Session 2 — 2026-07-07: Frontend Dashboard
 
@@ -422,7 +427,7 @@ aivenky/
 │   │   ├── middleware/
 │   │   │   └── authMiddleware.ts      # JWT auth (demo bypass mode)
 │   │   ├── models/
-│   │   │   └── userModel.ts           # Mongoose user schema
+│   │   │   └── userModel.ts           # Sequelize user schema
 │   │   ├── prompts/
 │   │   │   └── investmentPrompt.ts    # Structured Gemini prompt template
 │   │   ├── routes/
@@ -437,7 +442,7 @@ aivenky/
 │   │   ├── utils/
 │   │   │   └── errorHandler.ts        # Custom AppError class
 │   │   ├── app.ts                     # Express app setup + CORS
-│   │   └── server.ts                  # Server entry + MongoDB connect
+│   │   └── server.ts                  # Server entry + MySQL connect
 │   ├── .env.example
 │   ├── package.json
 │   └── tsconfig.json

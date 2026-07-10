@@ -1,16 +1,15 @@
 # Deployment Guide
 
-This guide explains how to deploy Aivenky Nova to production.
+This guide explains how to deploy InvestIQ to production using MySQL as the database.
 
 ## 1. Backend Deployment (Render)
 
 Render is a great platform for deploying the Express backend.
 
-1.  **Create a MongoDB Atlas Cluster**:
-    *   Go to [MongoDB Atlas](https://www.mongodb.com/cloud/atlas).
-    *   Create a free cluster.
-    *   Add a database user and allow access from anywhere (`0.0.0.0/0`).
-    *   Get your connection string (e.g., `mongodb+srv://<user>:<password>@cluster0.abc.mongodb.net/aivenky`).
+1.  **Set up a Hosted MySQL Instance**:
+    *   Create a MySQL database on a hosting provider (e.g., [Aiven](https://aiven.io/), [Tidb Cloud](https://www.pingcap.com/tidb-cloud/), [AWS RDS](https://aws.amazon.com/rds/), or Render's PostgreSQL/MySQL setup).
+    *   Create a database named `investiq`.
+    *   Obtain the connection parameters (Host, Port, User, Password, Database Name).
 
 2.  **Deploy to Render**:
     *   Create a new **Web Service** on Render.
@@ -19,8 +18,12 @@ Render is a great platform for deploying the Express backend.
     *   Build Command: `npm install && npm run build`
     *   Start Command: `npm start`
     *   **Environment Variables**:
-        *   `MONGODB_URI`: Your MongoDB Atlas connection string.
-        *   `JWT_SECRET`: A long, random string.
+        *   `MYSQL_DATABASE`: Name of the database (e.g., `investiq`).
+        *   `MYSQL_USER`: The MySQL username.
+        *   `MYSQL_PASSWORD`: The MySQL password.
+        *   `MYSQL_HOST`: Host address of the database.
+        *   `MYSQL_PORT`: `3306` (or database port).
+        *   `JWT_SECRET`: A long, random security string.
         *   `GEMINI_API_KEY`: Your Google Gemini API key.
         *   `PORT`: `5010` (or whatever you prefer).
 
@@ -57,7 +60,11 @@ Vercel is the best platform for React/Vite applications.
 
 | Platform | Variable | Purpose |
 | :--- | :--- | :--- |
-| **Render** | `MONGODB_URI` | Database connection |
+| **Render** | `MYSQL_DATABASE` | Database Name |
+| **Render** | `MYSQL_USER` | Database User |
+| **Render** | `MYSQL_PASSWORD` | Database Password |
+| **Render** | `MYSQL_HOST` | Database Hostname |
+| **Render** | `MYSQL_PORT` | Database Port (default 3306) |
 | **Render** | `GEMINI_API_KEY` | AI Research Engine |
 | **Render** | `JWT_SECRET` | Authentication security |
 | **Vercel** | `vercel.json` | API Routing |

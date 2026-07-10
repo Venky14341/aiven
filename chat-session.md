@@ -250,7 +250,29 @@ const result = await chain.invoke({ input: promptText });
 > Now generate a comprehensive README covering: Overview, How to Run, Architecture, Key Decisions & Trade-offs, Example Runs, Future Improvements, and the full LLM chat transcript.
 
 **AI Assistant:**
-> *(Generated the comprehensive README.md and this llm-chat-log.md)*
+> *(Generated the comprehensive README.md and this chat-session.md)*
+
+### Session 6 — 2026-07-10: Database Migration from MongoDB to MySQL
+
+**Developer:**
+> I want MySQL to use as the database instead of MongoDB.
+
+**AI Assistant:**
+> Understood. Since the database is only used for authentication persistence (saving/logging in users) and JWT validation, we can migrate the codebase from MongoDB (Mongoose) to MySQL (Sequelize ORM) smoothly.
+>
+> Here are the steps to execute this:
+> 1. Install `sequelize` and `mysql2` dependencies and remove `mongoose`.
+> 2. Create `backend/src/config/database.ts` to instantiate a Sequelize client.
+> 3. Refactor `backend/src/models/userModel.ts` to define the `User` model using Sequelize DataTypes instead of Mongoose Schema.
+> 4. Refactor `backend/src/controllers/authController.ts` to use Sequelize queries (`User.findOne({ where: { email } })` instead of Mongoose `User.findOne({ email })`).
+> 5. Refactor `backend/src/server.ts` to authenticate with MySQL (`sequelize.authenticate()`) and run schema synchronization (`sequelize.sync()`) on server start.
+> 6. Update `.env.example` and local `.env` with MySQL configuration parameters.
+
+**Actions taken:**
+- Installed `sequelize` and `mysql2` database drivers.
+- Swapped all user query commands and models to Sequelize/MySQL configurations.
+- Verified database configuration loads dynamic environment variables properly.
+- Swapped environment guide setups in documentation.
 
 ---
 
@@ -263,7 +285,8 @@ const result = await chain.invoke({ input: promptText });
 | 3       | 2026-07-08 | Deployment & CORS            | Vercel + Render deployment, CORS fix    |
 | 4       | 2026-07-09 | LangChain integration        | LCEL chain replacing raw API calls      |
 | 5       | 2026-07-10 | Polish & documentation       | Brand rename, UI redesign, README       |
+| 6       | 2026-07-10 | Database Migration           | Swapped MongoDB for MySQL + Sequelize   |
 
 ---
 
-*Total LLM interactions: ~5 sessions over 5 days, covering architecture design, implementation, debugging, and documentation.*
+*Total LLM interactions: ~6 sessions over 5 days, covering architecture design, implementation, database migration, and documentation.*
