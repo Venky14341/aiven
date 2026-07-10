@@ -1,70 +1,85 @@
 # Deployment Guide
 
-This guide explains how to deploy InvestIQ to production using MySQL as the database.
-
-## 1. Backend Deployment (Render)
-
-Render is a great platform for deploying the Express backend.
-
-1.  **Set up a Hosted MySQL Instance**:
-    *   Create a MySQL database on a hosting provider (e.g., [Aiven](https://aiven.io/), [Tidb Cloud](https://www.pingcap.com/tidb-cloud/), [AWS RDS](https://aws.amazon.com/rds/), or Render's PostgreSQL/MySQL setup).
-    *   Create a database named `investiq`.
-    *   Obtain the connection parameters (Host, Port, User, Password, Database Name).
-
-2.  **Deploy to Render**:
-    *   Create a new **Web Service** on Render.
-    *   Connect your GitHub repository.
-    *   Root Directory: `backend`
-    *   Build Command: `npm install && npm run build`
-    *   Start Command: `npm start`
-    *   **Environment Variables**:
-        *   `MYSQL_DATABASE`: Name of the database (e.g., `investiq`).
-        *   `MYSQL_USER`: The MySQL username.
-        *   `MYSQL_PASSWORD`: The MySQL password.
-        *   `MYSQL_HOST`: Host address of the database.
-        *   `MYSQL_PORT`: `3306` (or database port).
-        *   `JWT_SECRET`: A long, random security string.
-        *   `GEMINI_API_KEY`: Your Google Gemini API key.
-        *   `PORT`: `5010` (or whatever you prefer).
-
-3.  **Get your Backend URL**: Once deployed, Render will give you a URL like `https://aiven-backend.onrender.com`.
+This guide explains how to deploy InvestIQ to production using **Aiven** as the MySQL database host and **Render** for the backend.
 
 ---
 
-## 2. Frontend Deployment (Vercel)
+## 💾 1. Database Setup (Aiven)
 
-Vercel is the best platform for React/Vite applications.
+[Aiven](https://aiven.io/) provides a reliable cloud MySQL database with a free tier.
 
-1.  **Update `frontend/vercel.json`**:
-    Ensure the `destination` for `/api/(.*)` points to your Render backend URL.
-    ```json
-    {
-      "rewrites": [
-        { "source": "/api/(.*)", "destination": "https://your-backend-url.onrender.com/api/$1" },
-        { "source": "/((?!api/).*)", "destination": "/index.html" }
-      ]
-    }
-    ```
+1. **Sign Up & Create Service**:
+   * Go to [Aiven Console](https://console.aiven.io/) and create an account.
+   * Click **Create service**.
+   * Select **MySQL** as the database service.
+   * Choose the **Free** plan tier.
+   * Choose your cloud provider region (e.g. AWS or GCP close to your target audience).
+   * Enter a service name (e.g., `investiq-db`) and click **Create service**.
 
-2.  **Deploy to Vercel**:
-    *   Go to [Vercel](https://vercel.com).
-    *   Create a new project and connect your GitHub repository.
-    *   Root Directory: `frontend`
-    *   Framework Preset: `Vite`
-    *   **Environment Variables**:
-        *   `VITE_API_TARGET`: Your backend URL (optional, but good for local dev).
+2. **Get Connection Details**:
+   * Wait a few minutes for the service status to change from *Rebuilding* to *Running*.
+   * In the **Overview** tab under **Connection information**, copy the following values:
+     * **Host** (e.g., `mysql-3c1234a-yourorg-f12a.aivencloud.com`)
+     * **Port** (e.g., `12345`)
+     * **User** (typically `avnadmin`)
+     * **Password** (click *Show* to reveal and copy the secure password)
+     * **Database Name** (typically `defaultdb`)
 
 ---
 
-## 3. Environment Summary
+## 🚀 2. Backend Deployment (Render)
 
-| Platform | Variable | Purpose |
-| :--- | :--- | :--- |
-| **Render** | `MYSQL_DATABASE` | Database Name |
-| **Render** | `MYSQL_USER` | Database User |
-| **Render** | `MYSQL_PASSWORD` | Database Password |
-| **Render** | `MYSQL_HOST` | Database Hostname |
-| **Render** | `MYSQL_PORT` | Database Port (default 3306) |
-| **Render** | `GEMINI_API_KEY` | AI Research Engine |
-| **Render** | `JWT_SECRET` | Authentication security |
-| **Vercel** | `vercel.json` | API Routing |
+Render is used to deploy the Express backend.
+
+1. **Create Web Service**:
+   * Log into your [Render Console](https://dashboard.render.com/).
+   * Click **New +** and select **Web Service**.
+   * Connect your GitHub repository.
+   * Configure the service settings:
+     * **Name**: `investiq-backend`
+     * **Root Directory**: `backend`
+     * **Runtime**: `Node`
+     * **Build Command**: `npm install && npm run build`
+     * **Start Command**: `npm start`
+
+2. **Configure Environment Variables**:
+   Under the **Environment** tab, add the following variables using your connection details from Aiven:
+
+   | Key | Value | Notes |
+   | :--- | :--- | :--- |
+   | `MYSQL_HOST` | `mysql-3c1234a-yourorg-f12a.aivencloud.com` | Copy from Aiven Connection Details |
+   | `MYSQL_PORT` | `12345` | Copy from Aiven Connection Details |
+   | `MYSQL_USER` | `avnadmin` | Copy from Aiven Connection Details |
+   | `MYSQL_PASSWORD` | `your_aiven_password_here` | Copy from Aiven Connection Details |
+   | `MYSQL_DATABASE` | `defaultdb` | Default database created by Aiven |
+   | `GEMINI_API_KEY` | `your_google_gemini_api_key_here` | Your AI research key |
+   | `JWT_SECRET` | `your_strong_random_jwt_secret` | Random security string for auth tokens |
+   | `PORT` | `5010` | Port the backend will listen on |
+
+3. **Deploy & Grab URL**:
+   * Click **Create Web Service**.
+   * Render will build and start the server. Once successfully deployed, copy your backend URL (e.g., `https://investiq-backend.onrender.com`).
+
+---
+
+## 🌐 3. Frontend Deployment (Vercel)
+
+Vercel is used to deploy the React frontend.
+
+1. **Update `frontend/vercel.json`**:
+   Ensure the `destination` for `/api/(.*)` points to your newly deployed Render backend URL:
+   ```json
+   {
+     "rewrites": [
+       { "source": "/api/(.*)", "destination": "https://investiq-backend.onrender.com/api/$1" },
+       { "source": "/((?!api/).*)", "destination": "/index.html" }
+     ]
+   }
+   ```
+
+2. **Deploy to Vercel**:
+   * Go to [Vercel](https://vercel.com).
+   * Create a new project and import your GitHub repository.
+   * Set **Root Directory** to `frontend`.
+   * Set **Framework Preset** to `Vite`.
+   * Click **Deploy**. Vercel handles routing and bypasses CORS automatically through the proxy rules in `vercel.json`.
