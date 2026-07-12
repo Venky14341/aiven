@@ -181,6 +181,7 @@ function App() {
   const [loading, setLoading]             = useState(false);
   const [report, setReport]               = useState<ResearchReport | null>(null);
   const [error, setError]                 = useState('');
+  const [researchingCompany, setResearchingCompany] = useState('');
   const [userName, setUserName]           = useState<string | null>(null);
   const [theme, setTheme]                 = useState<'midnight' | 'neon' | 'emerald' | 'light'>(() => {
     return (localStorage.getItem('investiq_theme') as any) || 'midnight';
@@ -285,6 +286,7 @@ function App() {
     setLoading(true);
     setError('');
     setReport(null);
+    setResearchingCompany(companyName);
     setActiveSection('overview');
     try {
       const generated = await submitResearch(companyName);
@@ -675,7 +677,7 @@ function App() {
               </div>
             )}
 
-            {loading && <LoadingState />}
+            {loading && <LoadingState companyName={researchingCompany} />}
 
             {!loading && report && (
               <ReportDashboard
