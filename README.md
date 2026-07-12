@@ -2,7 +2,14 @@
 
 > A production-grade AI-powered investment research platform that generates comprehensive company analysis reports using Google Gemini, LangChain, and a modern React dashboard.
 
-**Live Demo:** Frontend on Vercel · Backend on Render
+---
+
+## 🌐 Live Deployment
+
+### ✅ **[https://aiven-omega.vercel.app/](https://aiven-omega.vercel.app/)**
+
+> The app is fully deployed and publicly accessible. Click the link above to try it live — no installation required.
+> Use **Demo Login** to instantly access the dashboard without creating an account.
 
 ---
 
