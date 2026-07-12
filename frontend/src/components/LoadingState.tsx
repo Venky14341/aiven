@@ -9,13 +9,13 @@ const STAGES = [
 ];
 
 export const LoadingState = ({ companyName }: { companyName?: string }) => {
-  const [elapsed, setElapsed] = useState(0);
   const [currentStage, setCurrentStage] = useState(0);
+  const [isSlow, setIsSlow] = useState(false);
 
-  // Elapsed timer
+  // Show patience message after 30 seconds
   useEffect(() => {
-    const t = setInterval(() => setElapsed(s => s + 1), 1000);
-    return () => clearInterval(t);
+    const t = setTimeout(() => setIsSlow(true), 30000);
+    return () => clearTimeout(t);
   }, []);
 
   // Auto-advance stages
@@ -31,9 +31,7 @@ export const LoadingState = ({ companyName }: { companyName?: string }) => {
     return () => timers.forEach(clearTimeout);
   }, []);
 
-  const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`;
 
-  const isSlow = elapsed > 30;
 
   return (
     <div className="animate-fade-in" style={{
@@ -65,19 +63,7 @@ export const LoadingState = ({ companyName }: { companyName?: string }) => {
           </p>
         </div>
 
-        {/* Elapsed timer */}
-        <div style={{
-          display: 'flex', flexDirection: 'column', alignItems: 'center',
-          background: 'var(--surface-2)', border: '1px solid var(--border)',
-          borderRadius: '14px', padding: '12px 16px', flexShrink: 0, minWidth: '72px'
-        }}>
-          <div className="font-mono" style={{ fontSize: '1.3rem', fontWeight: 900, color: isSlow ? 'var(--gold)' : 'var(--electric)', letterSpacing: '0.04em' }}>
-            {formatTime(elapsed)}
-          </div>
-          <div style={{ fontSize: '0.58rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginTop: '2px' }}>
-            Elapsed
-          </div>
-        </div>
+
       </div>
 
       {/* Overall progress bar */}
