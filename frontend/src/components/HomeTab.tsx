@@ -196,9 +196,101 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
   const [matchup, setMatchup] = useState<'nvda_amd' | 'aapl_msft' | 'tsla_byd'>('nvda_amd');
   const [compassCat, setCompassCat] = useState<'equities' | 'crypto' | 'macro'>('equities');
 
-  const [typingIndex, setTypingIndex] = useState(0);
-  const [typedText, setTypedText] = useState('');
-  const [isDeleting, setIsDeleting] = useState(false);
+  // Sector Heatmap selection state
+  const [selectedSector, setSelectedSector] = useState<string | null>(null);
+
+  // Growth calculator states
+  const [calcPrincipal, setCalcPrincipal] = useState(10000);
+  const [calcMonthly, setCalcMonthly] = useState(500);
+  const [calcYears, setCalcYears] = useState(10);
+
+  // News Verdict states
+  const [activeNewsId, setActiveNewsId] = useState<number | null>(null);
+  const [verdictLoading, setVerdictLoading] = useState(false);
+
+  // News Items Data
+  const NEWS_ITEMS = [
+    {
+      id: 1,
+      time: '20 mins ago',
+      source: 'Federal Reserve Board',
+      headline: 'Fed Chair Signals Potential Policy Easing in Q4 Citing Balanced Inflation Vectors',
+      category: 'Macro Policy',
+      verdict: 'BULLISH',
+      impactScore: 88,
+      action: 'Increase Mega-cap Tech and high-growth allocation. Defensive yields will contract.',
+      summary: 'The shift from inflation fears to labor market preservation indicates interest rates have peaked. High-growth sectors like AI infrastructure, software SaaS, and tech small-caps typically outperform during rate-cutting cycles as borrow costs fall.'
+    },
+    {
+      id: 2,
+      time: '1 hour ago',
+      source: 'Semiconductor Research Group',
+      headline: 'Blackwell GPU Chip Allocation Sold Out for Next 12 Months as Datacenter Demand Surges',
+      category: 'Tech Hardware',
+      verdict: 'STRONG BUY',
+      impactScore: 94,
+      action: 'Hold NVDA and accumulate key infrastructure suppliers (TSMC, ASML, Vertiv).',
+      summary: 'Blackwell architecture orders indicate cloud providers (Microsoft, Google, Meta) are continuing aggressive AI capital expenditures. Capex shows no signs of fatigue, validating compute demand scaling.'
+    },
+    {
+      id: 3,
+      time: '3 hours ago',
+      source: 'Automotive Intelligence Bureau',
+      headline: 'European EV Registrations Contract by 14% YoY in Q2 as Subsidies Phase Out',
+      category: 'Automotive',
+      verdict: 'BEARISH',
+      impactScore: 40,
+      action: 'Reduce direct EV automakers; accumulate hybrid supply chains and energy grid shares.',
+      summary: 'Consumer resistance remains high due to pricing barriers and grid density challenges. Automakers are cutting margins to defend volume share, impacting auto-industry profitability indices.'
+    }
+  ];
+
+  // Sector Data
+  const SECTOR_DATA = [
+    { id: 'tech', name: 'Technology', change: '+2.84%', up: true, leader: 'NVIDIA (NVDA)', cap: '$14.2T', rating: 'Strong Buy', summary: 'AI infrastructure scale-up and semiconductor supply bottlenecks remain highly constructive for enterprise hardware providers.' },
+    { id: 'finance', name: 'Financials', change: '+1.12%', up: true, leader: 'JPMorgan (JPM)', cap: '$8.6T', rating: 'Accumulate', summary: 'Expectations of federal rate cuts boost banking loan demand projections and trigger active capital market listings.' },
+    { id: 'health', name: 'Healthcare', change: '-0.45%', up: false, leader: 'Eli Lilly (LLY)', cap: '$7.8T', rating: 'Hold', summary: 'Clinical pipeline valuations consolidate, but strong defensive dividends and GLP-1 volume offsets offer balanced equity shelter.' },
+    { id: 'energy', name: 'Energy', change: '+1.85%', up: true, leader: 'Exxon Mobil (XOM)', cap: '$4.1T', rating: 'Accumulate', summary: 'Logistics constraints and global supply curbs keep barrel prices stable, returning significant cash to equity holders.' },
+    { id: 'consumer', name: 'Consumer Cyclical', change: '-1.15%', up: false, leader: 'Tesla (TSLA)', cap: '$6.5T', rating: 'Underperform', summary: 'Tight macroeconomic credit channels apply compression to consumer automotive sales and luxury retail margins.' },
+    { id: 'crypto', name: 'Crypto Assets', change: '+4.25%', up: true, leader: 'Bitcoin (BTC)', cap: '$2.4T', rating: 'Strong Buy', summary: 'Sustained institutional spot demand and regulated product structures channel capital directly into primary digital chains.' }
+  ];
+
+  // Compound Interest Calculation
+  const calculateGrowth = () => {
+    let rate = 0.055;
+    if (strategy === 'balanced') rate = 0.1115;
+    else if (strategy === 'moonshot') rate = 0.2125;
+
+    const r = rate / 12; // monthly rate
+    const n = calcYears * 12; // total months
+    
+    // P * (1 + r)^n
+    const fvPrincipal = calcPrincipal * Math.pow(1 + r, n);
+    
+    // PMT * [((1 + r)^n - 1) / r] * (1 + r)
+    const fvContributions = calcMonthly * ((Math.pow(1 + r, n) - 1) / r) * (1 + r);
+    
+    const totalValue = fvPrincipal + fvContributions;
+    const totalInvested = calcPrincipal + (calcMonthly * n);
+    const totalReturns = Math.max(0, totalValue - totalInvested);
+
+    return {
+      invested: Math.round(totalInvested),
+      returns: Math.round(totalReturns),
+      total: Math.round(totalValue)
+    };
+  };
+
+  const calcResults = calculateGrowth();
+
+  const handleVerdictTrigger = (id: number) => {
+    setVerdictLoading(true);
+    setActiveNewsId(id);
+    setTimeout(() => {
+      setVerdictLoading(false);
+    }, 750);
+  };
+
   const heroCardRef = useRef<HTMLDivElement>(null);
 
   const searchPlaceholders = [

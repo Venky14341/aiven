@@ -182,6 +182,10 @@ function App() {
   const [report, setReport]               = useState<ResearchReport | null>(null);
   const [error, setError]                 = useState('');
   const [userName, setUserName]           = useState<string | null>(null);
+  const [theme, setTheme]                 = useState<'midnight' | 'neon' | 'emerald' | 'light'>(() => {
+    return (localStorage.getItem('investiq_theme') as any) || 'midnight';
+  });
+  const [showThemeMenu, setShowThemeMenu] = useState(false);
   const [activeSection, setActiveSection] = useState<SectionId>('overview');
   const [activeNav, setActiveNav]         = useState<NavTab>('home');
   const [showUserMenu, setShowUserMenu]   = useState(false);
@@ -194,17 +198,17 @@ function App() {
   const [selectedMarket, setSelectedMarket] = useState<MarketAsset | null>(null);
   const [isMarketModalOpen, setIsMarketModalOpen] = useState(false);
 
-  // Auto-login check
+  // Auto-login check removed to force login page on startup / refresh
   useEffect(() => {
-    const initAuth = async () => {
-      const storedUser = authService.getStoredUser();
-      if (storedUser && authService.isAuthenticated()) {
-        setUserName(storedUser.name);
-      }
-      // Removed silent demo login to allow user to see the login page first
-    };
-    initAuth();
+    authService.logout();
+    setUserName(null);
   }, []);
+
+  // Update theme variable globally
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('investiq_theme', theme);
+  }, [theme]);
 
 
   useEffect(() => {
@@ -253,12 +257,16 @@ function App() {
   }, []);
   const searchRef = useRef<HTMLDivElement>(null);
   const userMenuRef = useRef<HTMLDivElement>(null);
+  const themeMenuRef = useRef<HTMLDivElement>(null);
 
-  // Close user menu on outside click
+  // Close menus on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
         setShowUserMenu(false);
+      }
+      if (themeMenuRef.current && !themeMenuRef.current.contains(e.target as Node)) {
+        setShowThemeMenu(false);
       }
     };
     document.addEventListener('mousedown', handler);
@@ -307,7 +315,7 @@ function App() {
     setReport(null);
     setError('');
     authService.logout();
-    setUserName('Demo User');
+    setUserName('logged-out');
     setActiveNav('home');
   };
 
@@ -419,6 +427,72 @@ function App() {
             <div className="badge badge-electric" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--emerald)', display: 'inline-block', animation: 'pulse-glow 2s infinite' }} />
               Live
+            </div>
+
+            {/* Theme Switcher Dropdown */}
+            <div ref={themeMenuRef} style={{ position: 'relative' }}>
+              <button
+                id="theme-select-btn"
+                type="button"
+                onClick={() => setShowThemeMenu(v => !v)}
+                style={{
+                  background: 'var(--surface-2)',
+                  border: '1px solid var(--border)',
+                  padding: '6px 12px',
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  fontSize: '0.82rem',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                  transition: 'all 0.2s',
+                  outline: 'none',
+                }}
+                onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-3)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)'; }}
+              >
+                <span style={{ fontSize: '0.9rem' }}>
+                  {theme === 'midnight' ? '🌙' : theme === 'neon' ? '🔮' : theme === 'emerald' ? '🌲' : '☀️'}
+                </span>
+                <span style={{ textTransform: 'capitalize' }}>{theme}</span>
+                <span style={{ fontSize: '0.65rem', opacity: 0.7 }}>▼</span>
+              </button>
+
+              {showThemeMenu && (
+                <div className="animate-fade-up glass" style={{
+                  position: 'absolute', top: 'calc(100% + 8px)', right: 0,
+                  width: '180px', borderRadius: '12px', padding: '6px',
+                  boxShadow: '0 12px 36px rgba(0,0,0,0.4)', zIndex: 200
+                }}>
+                  {[
+                    { id: 'midnight', label: 'Midnight Gold', icon: '🌙' },
+                    { id: 'neon', label: 'Cyber Neon', icon: '🔮' },
+                    { id: 'emerald', label: 'Emerald Forest', icon: '🌲' },
+                    { id: 'light', label: 'Alabaster Light', icon: '☀️' },
+                  ].map(t => (
+                    <button
+                      key={t.id}
+                      type="button"
+                      onClick={() => { setTheme(t.id as any); setShowThemeMenu(false); }}
+                      style={{
+                        width: '100%', display: 'flex', alignItems: 'center', gap: '10px',
+                        padding: '8px 12px', borderRadius: '8px', border: 'none',
+                        background: theme === t.id ? 'var(--surface-3)' : 'transparent',
+                        color: theme === t.id ? 'var(--electric)' : 'var(--text-secondary)',
+                        fontWeight: theme === t.id ? 600 : 500,
+                        fontSize: '0.8rem', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
+                        transition: 'all 0.15s', textAlign: 'left'
+                      }}
+                      onMouseEnter={e => { if (theme !== t.id) { (e.currentTarget as HTMLButtonElement).style.background = 'var(--surface-2)'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-primary)'; } }}
+                      onMouseLeave={e => { if (theme !== t.id) { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; (e.currentTarget as HTMLButtonElement).style.color = 'var(--text-secondary)'; } }}
+                    >
+                      <span style={{ fontSize: '0.95rem' }}>{t.icon}</span> {t.label}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* User avatar with dropdown */}
