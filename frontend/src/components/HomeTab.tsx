@@ -293,6 +293,10 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
 
   const heroCardRef = useRef<HTMLDivElement>(null);
 
+  const [typingIndex, setTypingIndex] = useState(0);
+  const [typedText, setTypedText] = useState('');
+  const [isDeleting, setIsDeleting] = useState(false);
+
   const searchPlaceholders = [
     'NVIDIA...',
     'Apple (AAPL)...',
@@ -1071,6 +1075,305 @@ export const HomeTab = ({ userName, onResearch }: HomeTabProps) => {
           </div>
           
         </div>
+      </section>
+
+      {/* ═══ INVESTMENT GROWTH ESTIMATOR ═══ */}
+      <section className="glass animate-card-entrance" style={{ borderRadius: '24px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '24px', zIndex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+          <div>
+            <div className="section-label" style={{ marginBottom: '4px' }}>COMPOUND GROWTH ENGINE</div>
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800 }}>Investment Growth Estimator</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>
+              Projected returns auto-calibrated to your selected strategy's historical rate.
+            </p>
+          </div>
+          <div className="badge badge-gold" style={{ padding: '6px 14px' }}>
+            {strategy === 'defensive' ? '🛡️ Defensive Mode · 5.5% p.a.' : strategy === 'balanced' ? '⚖️ Balanced Mode · 11.15% p.a.' : '🚀 Moonshot Mode · 21.25% p.a.'}
+          </div>
+        </div>
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', alignItems: 'start' }} className="home-hero-grid">
+
+          {/* Left — Inputs */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            {/* Initial Investment */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Initial Investment</label>
+                <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--electric)' }}>${calcPrincipal.toLocaleString()}</span>
+              </div>
+              <input
+                type="range" min={1000} max={100000} step={1000}
+                value={calcPrincipal}
+                onChange={e => setCalcPrincipal(Number(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--electric)', cursor: 'pointer', height: '4px' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '0.62rem', color: 'var(--text-muted)' }}>
+                <span>$1,000</span><span>$100,000</span>
+              </div>
+            </div>
+
+            {/* Monthly Contribution */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Monthly Contribution</label>
+                <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--violet)' }}>${calcMonthly.toLocaleString()}/mo</span>
+              </div>
+              <input
+                type="range" min={0} max={5000} step={100}
+                value={calcMonthly}
+                onChange={e => setCalcMonthly(Number(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--violet)', cursor: 'pointer', height: '4px' }}
+              />
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '4px', fontSize: '0.62rem', color: 'var(--text-muted)' }}>
+                <span>$0</span><span>$5,000</span>
+              </div>
+            </div>
+
+            {/* Time Horizon */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <label style={{ fontSize: '0.74rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Time Horizon</label>
+                <span className="font-mono" style={{ fontSize: '0.82rem', fontWeight: 800, color: 'var(--gold)' }}>{calcYears} yrs</span>
+              </div>
+              <div style={{ display: 'flex', gap: '8px' }}>
+                {[3, 5, 10, 15, 20, 30].map(y => (
+                  <button
+                    key={y} type="button"
+                    onClick={() => setCalcYears(y)}
+                    style={{
+                      flex: 1, padding: '8px 4px', borderRadius: '8px', border: 'none',
+                      fontSize: '0.74rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.2s',
+                      background: calcYears === y ? 'var(--gold-dim)' : 'var(--surface-2)',
+                      color: calcYears === y ? 'var(--gold)' : 'var(--text-muted)',
+                      outline: calcYears === y ? '1px solid rgba(240,180,41,0.3)' : 'none'
+                    }}
+                  >{y}Y</button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Right — Results */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            {/* Total Value Highlight */}
+            <div style={{
+              background: 'linear-gradient(135deg, rgba(52,211,153,0.06) 0%, rgba(0,212,255,0.04) 100%)',
+              border: '1px solid rgba(52,211,153,0.2)', borderRadius: '18px', padding: '24px', textAlign: 'center'
+            }}>
+              <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--emerald)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '8px' }}>Projected Portfolio Value</div>
+              <div className="font-mono" style={{ fontSize: '2.4rem', fontWeight: 900, color: 'var(--text-primary)', letterSpacing: '-0.02em' }}>
+                ${calcResults.total.toLocaleString()}
+              </div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--emerald)', marginTop: '6px', fontWeight: 600 }}>
+                +{calcResults.returns > 0 ? Math.round((calcResults.returns / calcResults.invested) * 100) : 0}% total return over {calcYears} years
+              </div>
+            </div>
+
+            {/* Breakdown */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '14px', padding: '14px' }}>
+                <div style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>Total Invested</div>
+                <div className="font-mono" style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--electric)' }}>${calcResults.invested.toLocaleString()}</div>
+              </div>
+              <div style={{ background: 'var(--surface-2)', border: '1px solid var(--border)', borderRadius: '14px', padding: '14px' }}>
+                <div style={{ fontSize: '0.66rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: '6px' }}>AI-Estimated Returns</div>
+                <div className="font-mono" style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--emerald)' }}>+${calcResults.returns.toLocaleString()}</div>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                <span>Capital Invested</span>
+                <span>Returns Generated</span>
+              </div>
+              <div style={{ height: '8px', borderRadius: '99px', background: 'var(--surface-3)', overflow: 'hidden', display: 'flex' }}>
+                <div style={{
+                  width: `${Math.min(100, (calcResults.invested / calcResults.total) * 100)}%`,
+                  background: 'var(--electric)', borderRadius: '99px 0 0 99px', transition: 'width 0.6s ease'
+                }} />
+                <div style={{
+                  flex: 1,
+                  background: 'linear-gradient(90deg, var(--emerald), var(--gold))', transition: 'all 0.6s ease'
+                }} />
+              </div>
+            </div>
+
+            <p style={{ fontSize: '0.68rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+              ⚠️ Projections use historical rate models. Actual returns vary with market conditions. Not financial advice.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ═══ AI ANALYST NEWS FEED ═══ */}
+      <section className="glass animate-card-entrance" style={{ borderRadius: '24px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '20px', zIndex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div className="section-label" style={{ marginBottom: '4px' }}>INTELLIGENCE FEED</div>
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800 }}>AI Analyst Briefings</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>Click any headline to generate an AI consensus verdict.</p>
+          </div>
+          <div className="badge badge-electric" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--emerald)', display: 'inline-block', animation: 'pulse-glow 2s infinite' }} />
+            Live Feed
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+          {NEWS_ITEMS.map(item => {
+            const verdictColor = item.verdict === 'STRONG BUY' ? 'var(--emerald)' : item.verdict === 'BULLISH' ? 'var(--electric)' : 'var(--rose)';
+            const isActive = activeNewsId === item.id;
+            return (
+              <div key={item.id} style={{ border: `1px solid ${isActive ? verdictColor + '40' : 'var(--border)'}`, borderRadius: '16px', overflow: 'hidden', transition: 'all 0.3s' }}>
+                {/* Headline row */}
+                <button
+                  type="button"
+                  onClick={() => handleVerdictTrigger(isActive ? 0 : item.id)}
+                  style={{
+                    width: '100%', display: 'flex', alignItems: 'center', gap: '16px', padding: '16px 20px',
+                    background: isActive ? `${verdictColor}06` : 'transparent', border: 'none', cursor: 'pointer',
+                    fontFamily: 'Inter, sans-serif', textAlign: 'left', transition: 'background 0.2s'
+                  }}
+                  onMouseEnter={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = 'rgba(255,255,255,0.015)'; }}
+                  onMouseLeave={e => { if (!isActive) (e.currentTarget as HTMLElement).style.background = 'transparent'; }}
+                >
+                  {/* Impact Score */}
+                  <div style={{ flexShrink: 0, width: '44px', height: '44px', borderRadius: '12px', background: `${verdictColor}12`, border: `1px solid ${verdictColor}30`, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <span className="font-mono" style={{ fontSize: '0.9rem', fontWeight: 900, color: verdictColor, lineHeight: 1 }}>{item.impactScore}</span>
+                    <span style={{ fontSize: '0.48rem', color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginTop: '1px' }}>IMPACT</span>
+                  </div>
+
+                  {/* Text content */}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginBottom: '6px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '0.64rem', fontWeight: 700, background: `${verdictColor}15`, color: verdictColor, padding: '2px 8px', borderRadius: '4px', textTransform: 'uppercase', letterSpacing: '0.06em' }}>{item.verdict}</span>
+                      <span style={{ fontSize: '0.65rem', color: 'var(--text-muted)', fontWeight: 600 }}>{item.category}</span>
+                      <span style={{ fontSize: '0.64rem', color: 'var(--text-muted)', marginLeft: 'auto' }}>⏱ {item.time}</span>
+                    </div>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.4 }}>{item.headline}</div>
+                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px' }}>📰 {item.source}</div>
+                  </div>
+
+                  <div style={{ flexShrink: 0, fontSize: '0.85rem', color: 'var(--text-muted)', transition: 'transform 0.3s', transform: isActive ? 'rotate(90deg)' : 'rotate(0deg)' }}>▶</div>
+                </button>
+
+                {/* Expanded Verdict Panel */}
+                {isActive && (
+                  <div className="animate-fade-in" style={{ borderTop: `1px solid ${verdictColor}20`, padding: '20px', background: `${verdictColor}04` }}>
+                    {verdictLoading ? (
+                      <div style={{ display: 'flex', gap: '12px', alignItems: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                        <div style={{ width: '18px', height: '18px', borderRadius: '50%', border: '2px solid var(--electric)', borderTopColor: 'transparent', animation: 'spin-slow 0.7s linear infinite' }} />
+                        AI Agent processing market signals...
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.1em' }}>🤖 InvestIQ AI Consensus Verdict</div>
+                        <p style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', lineHeight: 1.65 }}>{item.summary}</p>
+                        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                          <div style={{ fontSize: '0.72rem', fontWeight: 700, background: `${verdictColor}15`, color: verdictColor, padding: '6px 14px', borderRadius: '8px', border: `1px solid ${verdictColor}30` }}>
+                            ⚡ Recommended Action: {item.action}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* ═══ SECTOR PERFORMANCE HEATMAP ═══ */}
+      <section className="glass animate-card-entrance" style={{ borderRadius: '24px', padding: '30px', display: 'flex', flexDirection: 'column', gap: '24px', zIndex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+          <div>
+            <div className="section-label" style={{ marginBottom: '4px' }}>SECTOR INTELLIGENCE</div>
+            <h3 style={{ fontSize: '1.35rem', fontWeight: 800 }}>Market Sector Heatmap</h3>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '4px' }}>Click any sector to view signal intelligence and sector leaders.</p>
+          </div>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', fontWeight: 600, background: 'var(--surface-2)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+            Updated · {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          </div>
+        </div>
+
+        {/* Grid of sectors */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px' }}>
+          {SECTOR_DATA.map(sector => {
+            const isSelected = selectedSector === sector.id;
+            const changeColor = sector.up ? 'var(--emerald)' : 'var(--rose)';
+            const bgIntensity = sector.up ? 'rgba(52,211,153,0.06)' : 'rgba(251,113,133,0.06)';
+            return (
+              <button
+                key={sector.id}
+                type="button"
+                onClick={() => setSelectedSector(isSelected ? null : sector.id)}
+                style={{
+                  background: isSelected ? bgIntensity : 'var(--surface-2)',
+                  border: `1px solid ${isSelected ? changeColor + '40' : 'var(--border)'}`,
+                  borderRadius: '16px', padding: '16px', cursor: 'pointer',
+                  fontFamily: 'Inter, sans-serif', textAlign: 'left', transition: 'all 0.25s',
+                  outline: 'none'
+                }}
+                onMouseEnter={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = bgIntensity; (e.currentTarget as HTMLElement).style.borderColor = changeColor + '30'; } }}
+                onMouseLeave={e => { if (!isSelected) { (e.currentTarget as HTMLElement).style.background = 'var(--surface-2)'; (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; } }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '0.84rem', fontWeight: 800, color: 'var(--text-primary)' }}>{sector.name}</div>
+                  <span className="font-mono" style={{ fontSize: '0.78rem', fontWeight: 900, color: changeColor }}>{sector.change}</span>
+                </div>
+                <div style={{ height: '6px', borderRadius: '99px', background: 'var(--surface-3)', overflow: 'hidden', marginBottom: '10px' }}>
+                  <div style={{
+                    height: '100%', background: changeColor, borderRadius: '99px',
+                    width: `${Math.min(100, Math.abs(parseFloat(sector.change)) * 20 + 30)}%`,
+                    transition: 'width 0.5s ease'
+                  }} />
+                </div>
+                <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>📊 Cap: {sector.cap}</div>
+                <div style={{
+                  marginTop: '8px', fontSize: '0.66rem', fontWeight: 700, padding: '3px 8px', borderRadius: '4px',
+                  background: sector.rating === 'Strong Buy' ? 'rgba(52,211,153,0.1)' : sector.rating === 'Accumulate' ? 'rgba(0,212,255,0.1)' : sector.rating === 'Hold' ? 'rgba(240,180,41,0.1)' : 'rgba(251,113,133,0.1)',
+                  color: sector.rating === 'Strong Buy' ? 'var(--emerald)' : sector.rating === 'Accumulate' ? 'var(--electric)' : sector.rating === 'Hold' ? 'var(--gold)' : 'var(--rose)',
+                  display: 'inline-block', textTransform: 'uppercase', letterSpacing: '0.06em'
+                }}>
+                  {sector.rating}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Expanded Detail Panel */}
+        {selectedSector && (() => {
+          const sector = SECTOR_DATA.find(s => s.id === selectedSector);
+          if (!sector) return null;
+          const changeColor = sector.up ? 'var(--emerald)' : 'var(--rose)';
+          return (
+            <div className="animate-fade-in" style={{
+              background: sector.up ? 'rgba(52,211,153,0.04)' : 'rgba(251,113,133,0.04)',
+              border: `1px solid ${changeColor}25`,
+              borderRadius: '16px', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                <div>
+                  <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em' }}>Sector Leader</div>
+                  <div style={{ fontSize: '1rem', fontWeight: 800, color: changeColor, marginTop: '2px' }}>{sector.leader}</div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => onResearch(sector.leader.split(' ')[0])}
+                  className="btn-primary"
+                  style={{ padding: '8px 18px', fontSize: '0.78rem', borderRadius: '10px' }}
+                >
+                  Analyse with AI →
+                </button>
+              </div>
+              <p style={{ fontSize: '0.83rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>{sector.summary}</p>
+            </div>
+          );
+        })()}
       </section>
 
     </div>
